@@ -16,16 +16,12 @@ class Zenith_Mobile_Auth_Public {
 
         add_action( 'wp_head', [ $this, 'dynamic_styles' ] );
         
-        // WooCommerce Hooks
         add_filter( 'woocommerce_account_details_fields', [ $this, 'clean_account_details' ], 10, 1 );
         add_action( 'woocommerce_edit_account_form', [ $this, 'readonly_phone_field' ] );
         
-        // Gender Hooks
         if ( isset($this->options['enable_gender_field']) && $this->options['enable_gender_field'] == '1' ) {
             add_action( 'woocommerce_edit_account_form', [ $this, 'render_gender_field_account' ] );
             add_action( 'woocommerce_save_account_details', [ $this, 'save_gender_field_account' ] );
-            
-            // Checkout Gender
             add_filter( 'woocommerce_checkout_fields', [ $this, 'add_gender_checkout_field' ] );
             add_action( 'woocommerce_checkout_update_user_meta', [ $this, 'save_gender_checkout_field' ] );
         }
@@ -100,6 +96,11 @@ class Zenith_Mobile_Auth_Public {
                 border-radius: {$btn_rad};
             }
             .zma-input-group { margin-bottom: " . esc_attr($o['inp_margin'] ?? '15px') . "; }
+            
+            /* Gender Radio Styles */
+            .zma-gender-options { display: flex; gap: 20px; align-items: center; }
+            .zma-gender-label { display: flex; align-items: center; cursor: pointer; font-weight: normal !important; }
+            .zma-gender-label input { margin-right: 5px; width: auto !important; }
         ";
         echo "<style>{$css}</style>";
     }
@@ -119,7 +120,7 @@ class Zenith_Mobile_Auth_Public {
                 <p><?php esc_html_e( 'We will send an OTP code to your mobile number.', 'zenith-mobile-auth' ); ?></p>
             </div>
             
-            <!-- Step 1: Phone -->
+            <!-- Step 1 -->
             <div id="zma-step-phone" class="zma-step active">
                 <div class="zma-input-group">
                     <label for="zma-phone"><?php esc_html_e( 'Phone Number', 'zenith-mobile-auth' ); ?></label>
@@ -128,13 +129,12 @@ class Zenith_Mobile_Auth_Public {
                 <button type="button" id="zma-send-otp-btn" class="zma-btn"><?php esc_html_e( 'Send Code', 'zenith-mobile-auth' ); ?></button>
             </div>
 
-            <!-- Step 2: OTP -->
+            <!-- Step 2 -->
             <div id="zma-step-otp" class="zma-step">
                 <p style="text-align:center; margin-bottom:15px;">
                     <?php esc_html_e( 'Code sent to', 'zenith-mobile-auth' ); ?> <span id="zma-phone-display" style="font-weight:bold;"></span>
                     <br><a href="#" id="zma-change-number" style="font-size:12px;"><?php esc_html_e( 'Change Number', 'zenith-mobile-auth' ); ?></a>
                 </p>
-                
                 <div class="zma-input-group zma-otp-container">
                     <input type="text" id="zma-otp-real" inputmode="numeric" autocomplete="one-time-code" maxlength="<?php echo esc_attr($otp_len); ?>">
                     <div class="zma-otp-group">
@@ -143,7 +143,6 @@ class Zenith_Mobile_Auth_Public {
                         <?php endfor; ?>
                     </div>
                 </div>
-
                 <button type="button" id="zma-verify-otp-btn" class="zma-btn"><?php esc_html_e( 'Verify & Login', 'zenith-mobile-auth' ); ?></button>
                 <div class="zma-resend-wrapper">
                     <span id="zma-timer-text"><?php esc_html_e('Resend in', 'zenith-mobile-auth'); ?> <span id="zma-timer">0</span>s</span>
@@ -151,7 +150,7 @@ class Zenith_Mobile_Auth_Public {
                 </div>
             </div>
 
-            <!-- Step 3: Info Collection (Hidden by default) -->
+            <!-- Step 3: Info (Updated with Radio) -->
             <div id="zma-step-info" class="zma-step">
                 <p style="text-align:center; margin-bottom:15px; font-weight:bold;">
                     <?php esc_html_e( 'Complete your profile', 'zenith-mobile-auth' ); ?>
@@ -169,12 +168,15 @@ class Zenith_Mobile_Auth_Public {
 
                 <?php if ( isset($this->options['enable_gender_field']) && $this->options['enable_gender_field'] == '1' ): ?>
                 <div class="zma-input-group">
-                    <label for="zma-gender"><?php esc_html_e( 'Gender', 'zenith-mobile-auth' ); ?></label>
-                    <select id="zma-gender" class="zma-select">
-                        <option value=""><?php esc_html_e( 'Select Gender', 'zenith-mobile-auth' ); ?></option>
-                        <option value="male"><?php esc_html_e( 'Male', 'zenith-mobile-auth' ); ?></option>
-                        <option value="female"><?php esc_html_e( 'Female', 'zenith-mobile-auth' ); ?></option>
-                    </select>
+                    <label><?php esc_html_e( 'Gender', 'zenith-mobile-auth' ); ?></label>
+                    <div class="zma-gender-options">
+                        <label class="zma-gender-label">
+                            <input type="radio" name="zma_gender" value="male"> <?php esc_html_e( 'Male', 'zenith-mobile-auth' ); ?>
+                        </label>
+                        <label class="zma-gender-label">
+                            <input type="radio" name="zma_gender" value="female"> <?php esc_html_e( 'Female', 'zenith-mobile-auth' ); ?>
+                        </label>
+                    </div>
                 </div>
                 <?php endif; ?>
 
@@ -227,14 +229,13 @@ class Zenith_Mobile_Auth_Public {
         <?php
     }
 
-    // Gender Field in My Account
     public function render_gender_field_account() {
         $user_id = get_current_user_id();
         $gender = get_user_meta( $user_id, 'gender', true );
         ?>
         <p class="woocommerce-form-row form-row form-row-wide">
-            <label for="account_gender"><?php esc_html_e( 'Gender', 'zenith-mobile-auth' ); ?></label>
-            <select name="account_gender" id="account_gender" class="woocommerce-Input">
+            <label><?php esc_html_e( 'Gender', 'zenith-mobile-auth' ); ?></label>
+            <select name="account_gender" class="woocommerce-Input">
                 <option value=""><?php esc_html_e( 'Select Gender', 'zenith-mobile-auth' ); ?></option>
                 <option value="male" <?php selected( $gender, 'male' ); ?>><?php esc_html_e( 'Male', 'zenith-mobile-auth' ); ?></option>
                 <option value="female" <?php selected( $gender, 'female' ); ?>><?php esc_html_e( 'Female', 'zenith-mobile-auth' ); ?></option>
@@ -249,7 +250,6 @@ class Zenith_Mobile_Auth_Public {
         }
     }
 
-    // Gender in Checkout
     public function add_gender_checkout_field( $fields ) {
         $fields['billing']['billing_gender'] = array(
             'label'     => __( 'Gender', 'zenith-mobile-auth' ),
@@ -263,14 +263,11 @@ class Zenith_Mobile_Auth_Public {
             'class'     => ['form-row-wide'],
             'priority'  => 25
         );
-        
-        // Populate if logged in
         if ( is_user_logged_in() ) {
             $user_id = get_current_user_id();
             $gender = get_user_meta( $user_id, 'gender', true );
             if($gender) $fields['billing']['billing_gender']['default'] = $gender;
         }
-
         return $fields;
     }
 
