@@ -3,7 +3,7 @@
  * Plugin Name: Zenith Mobile Auth (OTP)
  * Plugin URI:  https://zenithteam.co
  * Description: Replaces WooCommerce login/register forms with a mobile-only OTP system. Supports Multiple Gateways (IPPanel default).
- * Version:     2.2.1
+ * Version:     1.0.0
  * Author:      Mahdi Soltani
  * Author URI:  https://zenithteam.co/mahdi-soltani
  * License:     GPL2
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'ZMA_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZMA_URL', plugin_dir_url( __FILE__ ) );
-define( 'ZMA_VERSION', '2.2.1' );
+define( 'ZMA_VERSION', '1.0.0' );
 
 // 1. Load Abstract & Manager First
 require_once ZMA_PATH . 'includes/abstract-zma-gateway.php';
