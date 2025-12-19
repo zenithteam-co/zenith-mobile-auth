@@ -69,4 +69,4 @@ add_action('zma_register_gateways', function() {
 ```
 ## Credits
 
-Developed by [Mahdi Soltani](https://www.google.com/search?q=https://zenithteam.co/mahdi-soltani) | [Zenith Team](https://zenithteam.co).
+Developed by [Mahdi Soltani](https://zenithteam.co/mahdi-soltani) | [Zenith Team](https://zenithteam.co).
