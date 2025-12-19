@@ -57,7 +57,7 @@ class Zenith_Mobile_Auth {
             
             // Init Updater
             // REPLACE 'your-github-username' and 'your-repo-name' below
-            new Zenith_Mobile_Auth_Updater( __FILE__, 'your-github-username', 'zenith-mobile-auth' );
+            new Zenith_Mobile_Auth_Updater( __FILE__, 'zenithteam-co', 'zenith-mobile-auth' );
         }
     }
 }
