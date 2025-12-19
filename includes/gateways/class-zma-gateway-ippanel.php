@@ -1,6 +1,9 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+/**
+ * IPPanel Gateway Implementation
+ */
 class ZMA_Gateway_IPPanel extends ZMA_Gateway {
 
     private $api_url = 'https://edge.ippanel.com/v1/api/send';

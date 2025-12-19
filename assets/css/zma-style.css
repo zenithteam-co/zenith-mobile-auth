@@ -4,15 +4,18 @@
     margin: 0 auto;
     font-family: inherit;
     box-sizing: border-box;
+    position: relative;
 }
 
 .zma-step { display: none; }
-.zma-step.active { display: block; }
+.zma-step.active { display: block; animation: zma-fadein 0.3s; }
 
 /* Input Groups */
+.zma-input-group { position: relative; margin-bottom: 15px; }
 .zma-input-group label {
     display: block;
     font-weight: 600;
+    margin-bottom: 5px;
 }
 
 .zma-input {
@@ -26,6 +29,7 @@
     box-sizing: border-box;
 }
 
+/* Button */
 .zma-btn {
     width: 100%;
     padding: 12px;
@@ -34,6 +38,7 @@
     cursor: pointer;
     font-size: 16px;
     transition: opacity 0.3s;
+    text-align: center;
 }
 .zma-btn:hover { opacity: 0.9; }
 .zma-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -42,9 +47,12 @@
 .zma-otp-container {
     position: relative;
     width: 100%;
+    display: block;
+    margin: 0 auto 15px;
 }
 
-#zma-otp-real {
+/* Real Input (Hidden but interactive) */
+.zma-otp-real {
     position: absolute;
     top: 0;
     left: 0;
@@ -52,16 +60,19 @@
     height: 100%;
     opacity: 0;
     z-index: 10;
-    cursor: default;
+    cursor: text;
+    font-size: 16px;
     color: transparent;
     background: transparent;
     border: none;
     outline: none;
+    caret-color: transparent; /* Hide default caret */
 }
 
+/* Visual Boxes */
 .zma-otp-group {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     justify-content: center;
     direction: ltr;
 }
@@ -76,24 +87,19 @@
     margin: 0;
     background: #fff;
     color: #333;
-    pointer-events: none;
-    transition: border-color 0.2s;
+    pointer-events: none; /* Let clicks pass to real input */
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Active State (Cursor Simulation) */
+/* Active Box Highlight */
 .zma-otp-digit.active {
-    border-color: #007cba; /* Highlight Color */
+    border-color: #007cba;
     box-shadow: 0 0 0 1px #007cba;
-    animation: zma-blink 1.2s infinite;
-}
-
-@keyframes zma-blink {
-    0%, 100% { border-color: #007cba; box-shadow: 0 0 0 1px #007cba; }
-    50% { border-color: #ccc; box-shadow: none; }
+    background-color: #f9f9f9;
 }
 
 /* Header */
-.zma-header { text-align: center; }
+.zma-header { text-align: center; margin-bottom: 20px; }
 .zma-header h3 { margin: 0 0 5px; }
 .zma-header p { margin: 0; font-size: 14px; color: #666; }
 
@@ -111,10 +117,16 @@
     cursor: pointer;
     font-size: inherit;
     padding: 0;
+    display: inline;
 }
 
+/* Gender Options */
+.zma-gender-options { display: flex; gap: 20px; align-items: center; }
+.zma-gender-label { display: flex; align-items: center; cursor: pointer; font-weight: normal !important; margin-right: 15px; }
+.zma-gender-label input { margin-right: 5px; width: auto !important; }
+
 /* Toast */
-#zma-toast {
+.zma-toast {
     visibility: hidden;
     min-width: 250px;
     background-color: #333;
@@ -128,10 +140,11 @@
     bottom: 30px;
     transform: translateX(-50%);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 14px;
 }
-#zma-toast.show { visibility: visible; animation: zma-fadein 0.5s, zma-fadeout 0.5s 2.5s; }
-#zma-toast.error { background-color: #e74c3c; }
-#zma-toast.success { background-color: #2ecc71; }
+.zma-toast.show { visibility: visible; animation: zma-fadein 0.5s, zma-fadeout 0.5s 2.5s; }
+.zma-toast.error { background-color: #e74c3c; }
+.zma-toast.success { background-color: #2ecc71; }
 
 @keyframes zma-fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
 @keyframes zma-fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }

@@ -1,11 +1,9 @@
 jQuery(document).ready(function($) {
     
-    // Scoped variables are tricky with multiple instances.
-    // We attach data to the container DOM element instead.
-
+    // Auto-focus phone on load
     setTimeout(function() {
         $('.zma-phone').prop('disabled', false).first().focus();
-    }, 500);
+    }, 300);
 
     function showToast(container, msg, type) {
         var x = container.find('.zma-toast');
@@ -35,7 +33,6 @@ jQuery(document).ready(function($) {
         timerText.show();
         timerSpan.text(timeLeft);
 
-        // Clear existing timer if any
         if (container.data('timer')) clearInterval(container.data('timer'));
 
         var interval = setInterval(function() {
@@ -72,16 +69,23 @@ jQuery(document).ready(function($) {
             security: zma_vars.nonce
         }, function(response) {
             if(response.success) {
-                container.data('token', response.data.token); // Store token on container
-                $(btn).text(originalText); // Restore text
+                container.data('token', response.data.token);
+                $(btn).text(originalText);
                 
                 showToast(container, response.data.message, 'success');
                 container.find('.zma-phone-display').text(response.data.phone);
                 
+                // Switch Steps
                 container.find('.zma-step-phone').removeClass('active');
                 container.find('.zma-step-otp').addClass('active');
                 
-                container.find('.zma-otp-real').val('').focus();
+                // Initialize OTP Input: Enable, Clear, and Focus
+                var realInput = container.find('.zma-otp-real');
+                realInput.prop('disabled', false).val('').focus();
+                
+                // Reset visual boxes
+                container.find('.zma-otp-digit').val('').removeClass('active');
+                container.find('.zma-otp-digit').first().addClass('active'); // Highlight first box
                 
                 startTimer(container);
             } else {
@@ -117,7 +121,7 @@ jQuery(document).ready(function($) {
                 if ( response.data.new_nonce ) zma_vars.nonce = response.data.new_nonce;
 
                 if ( response.data.require_info ) {
-                    container.data('session_token', response.data.session_token); // Store secure session token
+                    container.data('session_token', response.data.session_token);
                     container.data('redirect', response.data.redirect_to);
                     
                     showToast(container, response.data.message, 'success');
@@ -139,7 +143,6 @@ jQuery(document).ready(function($) {
         var container = $(btn).closest('.zma-container');
         var fname = container.find('.zma-fname').val();
         var lname = container.find('.zma-lname').val();
-        // Fix for radio buttons: find checked in THIS container
         var gender = container.find('.zma-gender:checked').val();
         
         if ( !isSkip && (!fname || !lname) ) {
@@ -169,7 +172,7 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // --- Events (Delegated to handle dynamic elements) ---
+    // --- Events ---
     $(document).on('click', '.zma-send-otp-btn', function() { sendOtp(this); });
     $(document).on('click', '.zma-resend-btn', function() { sendOtp(this); });
     $(document).on('click', '.zma-verify-otp-btn', function() { verifyOtp(this); });
@@ -185,15 +188,18 @@ jQuery(document).ready(function($) {
         setTimeout(function(){ container.find('.zma-phone').prop('disabled', false).focus(); }, 100);
     });
 
+    // Auto-submit Phone
     $(document).on('input', '.zma-phone', function() {
         var val = $(this).val();
         var clean = toEnglish(val);
         if (val !== clean) $(this).val(clean);
-        if (clean.length === 11) sendOtp( $(this).siblings('.zma-send-otp-btn') ); 
+        if (clean.length === 11) {
+            sendOtp( $(this).closest('.zma-step-phone').find('.zma-send-otp-btn') ); 
+        }
     });
 
-    // Real OTP Input Handler
-    $(document).on('input focus blur', '.zma-otp-real', function(e) {
+    // Handle Real OTP Input Interaction
+    $(document).on('input focus blur click', '.zma-otp-real', function(e) {
         var val = $(this).val();
         var clean = toEnglish(val);
         var container = $(this).closest('.zma-container');
@@ -209,7 +215,8 @@ jQuery(document).ready(function($) {
             if(i < clean.length) boxes.eq(i).val(clean[i]);
         }
 
-        if (e.type === 'focus' || e.type === 'input') {
+        // Highlight Active Box
+        if (e.type === 'focus' || e.type === 'input' || e.type === 'click') {
             var activeIndex = clean.length;
             if (activeIndex < zma_vars.otp_len) boxes.eq(activeIndex).addClass('active');
         }

@@ -6,17 +6,12 @@ class ZMA_Gateway_Manager {
     private static $gateways = [];
 
     public static function init() {
-        // Hook to register gateways
-        add_action( 'init', [ __CLASS__, 'load_gateways' ] );
-    }
-
-    public static function load_gateways() {
-        // Register Default
+        // Register default gateways immediately
         if ( class_exists( 'ZMA_Gateway_IPPanel' ) ) {
             self::register( new ZMA_Gateway_IPPanel() );
         }
 
-        // Allow other plugins to register
+        // Allow external registration
         do_action( 'zma_register_gateways' );
     }
 
@@ -36,7 +31,6 @@ class ZMA_Gateway_Manager {
             return self::$gateways[ $active_id ];
         }
 
-        // Fallback to first available or return null
         return !empty(self::$gateways) ? reset(self::$gateways) : null;
     }
 }
