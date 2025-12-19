@@ -1,8 +1,8 @@
-**Zenith Mobile Auth (OTP)**
+# Zenith Mobile Auth (OTP)
 
-**Zenith Mobile Auth** is a WordPress plugin that replaces the standard WooCommerce login and registration forms with a secure, mobile-number-based OTP (One-Time Password) system. Designed for the Iranian market with support for IPPanel.
+**Zenith Mobile Auth** is a WordPress plugin that replaces the standard WooCommerce login and registration forms with a secure, mobile-number-based OTP (One-Time Password) system. Designed for the Iranian market with support for IPPanel and extensible Gateways.
 
-**Features**
+## Features
 
 - **Mobile-Only Authentication:** Users login/register using only their phone number.
 - **OTP Verification:** Secure 4-6 digit code verification via SMS.
@@ -15,32 +15,70 @@
     - Wait timer between resend requests.
     - Session hijacking protection (Nonce/Token matching).
     - WebOTP API support (Auto-read SMS on Android).
+- **Multiple Gateways:** Architecture to support multiple SMS providers.
+- **Shortcode:** Use \[zenith_mobile_auth\] to display the login form anywhere.
 
-**Installation**
+## Installation
 
 1.  Download the latest release from the \[suspicious link removed\] page.
 2.  Upload the zip file to your WordPress **Plugins > Add New** section.
 3.  Activate the plugin.
 4.  Go to **Settings > Zenith Mobile Auth**.
-5.  Enter your IPPanel **API Key**, **Originator**, and **Pattern Code**.
+5.  Select your Gateway (e.g., IPPanel) and enter your **API Key**, **Originator**, and **Pattern Code**.
 
-**Configuration**
+## Configuration
 
-**SMS Pattern**
+### SMS Pattern
 
-Create a pattern in your IPPanel dashboard with the following format to support Auto-fill: Your verification code is %code%. \\n @yourdomain.com #%code%
+Create a pattern in your IPPanel dashboard with the following format to support Auto-fill:
 
-**Settings**
+Your verification code is %code%.
 
-- **General:** API keys and Pattern variables.
+@yourdomain.com #%code%
+
+### Settings
+
+- **General:** Gateway selection, API keys, and Pattern variables.
 - **Registration:** Enable/Disable Name and Gender fields.
 - **Style:** Customize colors, borders, and spacing with a live preview.
 - **Security:** Set daily limits and resend timers.
 
-**Updates**
+## Updates
 
 This plugin supports automatic updates via GitHub. When a new release is tagged on this repository, WordPress will detect the update.
 
-**Credits**
+## Extending Gateways
+
+To add a new SMS provider, extend the ZMA_Gateway class and register it:
+
+class My_Custom_Gateway extends ZMA_Gateway {
+
+public function \__construct() {
+
+$this->id = 'custom_gw';
+
+$this->name = 'My Custom Gateway';
+
+parent::\__construct();
+
+}
+
+public function send_pattern($phone, $otp) {
+
+// API Logic here
+
+return true; // or error string
+
+}
+
+}
+
+add_action('zma_register_gateways', function() {
+
+ZMA_Gateway_Manager::register(new My_Custom_Gateway());
+
+});
+
+## Credits
 
 Developed by [Mahdi Soltani](https://www.google.com/search?q=https://zenithteam.co/mahdi-soltani) | [Zenith Team](https://zenithteam.co).
