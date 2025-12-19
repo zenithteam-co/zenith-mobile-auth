@@ -1,0 +1,149 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Zenith Mobile Auth 2.2.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"Language: fa_IR\n"
+
+msgid "Zenith Mobile Auth"
+msgstr "احراز هویت موبایلی زنیت"
+
+msgid "Mobile Auth (OTP)"
+msgstr "ورود پیامکی (OTP)"
+
+msgid "Login or Register"
+msgstr "ورود یا ثبت نام"
+
+msgid "We will send an OTP code to your mobile number."
+msgstr "ما یک کد تایید به شماره موبایل شما ارسال می‌کنیم."
+
+msgid "Phone Number"
+msgstr "شماره موبایل"
+
+msgid "Send Code"
+msgstr "ارسال کد"
+
+msgid "Zenith Mobile Auth Status"
+msgstr "وضعیت احراز هویت زنیت"
+
+msgid "Daily SMS Usage"
+msgstr "مصرف روزانه پیامک"
+
+msgid "Security Status"
+msgstr "وضعیت امنیتی"
+
+msgid "In Wait Time (Resend Blocked)"
+msgstr "در زمان انتظار (ارسال مجدد مسدود)"
+
+msgid "Blocked (Too many incorrect attempts)"
+msgstr "مسدود شده (تلاش ناموفق بیش از حد)"
+
+msgid "%d Incorrect Attempts (Max %d)"
+msgstr "%d تلاش ناموفق (حداکثر %d)"
+
+msgid "Clean (No issues)"
+msgstr "وضعیت عادی"
+
+msgid "Actions"
+msgstr "عملیات"
+
+msgid "Unblock & Reset Limits"
+msgstr "رفع مسدودی و ریست محدودیت‌ها"
+
+msgid "This will reset the daily limit count, wait timer, and incorrect attempt counter for this user."
+msgstr "این عملیات محدودیت روزانه، تایمر انتظار و شمارنده تلاش‌های ناموفق کاربر را ریست می‌کند."
+
+msgid "Gender"
+msgstr "جنسیت"
+
+msgid "Male"
+msgstr "مرد"
+
+msgid "Female"
+msgstr "زن"
+
+msgid "Invalid Phone"
+msgstr "شماره موبایل نامعتبر است"
+
+msgid "Daily SMS limit reached. Try tomorrow."
+msgstr "محدودیت روزانه پیامک به پایان رسید. فردا تلاش کنید."
+
+msgid "Please wait %d seconds before requesting a new code."
+msgstr "لطفا %d ثانیه صبر کنید تا بتوانید کد جدید درخواست دهید."
+
+msgid "Code Sent"
+msgstr "کد ارسال شد"
+
+msgid "Code expired. Please request a new code."
+msgstr "کد منقضی شده است. لطفا کد جدید درخواست کنید."
+
+msgid "Session mismatch. Please request a new code."
+msgstr "عدم تطابق نشست. لطفا کد جدید درخواست کنید."
+
+msgid "Too many failed attempts. Code invalidated."
+msgstr "تلاش‌های ناموفق بیش از حد. کد باطل شد."
+
+msgid "Invalid Code. %d attempts remaining."
+msgstr "کد نامعتبر است. %d تلاش باقی مانده."
+
+msgid "Verification Successful. Please complete your profile."
+msgstr "تایید موفقیت‌آمیز بود. لطفا پروفایل خود را تکمیل کنید."
+
+msgid "Login Successful"
+msgstr "ورود موفقیت‌آمیز بود"
+
+msgid "Session expired. Please restart login."
+msgstr "نشست منقضی شد. لطفا مجددا وارد شوید."
+
+msgid "Profile Updated. Redirecting..."
+msgstr "پروفایل بروز شد. در حال انتقال..."
+
+msgid "Code sent to"
+msgstr "کد ارسال شد به"
+
+msgid "Change Number"
+msgstr "تغییر شماره"
+
+msgid "Verify & Login"
+msgstr "تایید و ورود"
+
+msgid "Resend in"
+msgstr "ارسال مجدد در"
+
+msgid "Resend Code"
+msgstr "ارسال مجدد کد"
+
+msgid "Complete your profile"
+msgstr "تکمیل پروفایل"
+
+msgid "First Name"
+msgstr "نام"
+
+msgid "Last Name"
+msgstr "نام خانوادگی"
+
+msgid "Save & Continue"
+msgstr "ذخیره و ادامه"
+
+msgid "Skip for now"
+msgstr "فعلا رد شوم"
+
+msgid "Sending..."
+msgstr "در حال ارسال..."
+
+msgid "Verifying..."
+msgstr "در حال بررسی..."
+
+msgid "Saving..."
+msgstr "در حال ذخیره..."
+
+msgid "Enter Full Code"
+msgstr "کد را کامل وارد کنید"
+
+msgid "Please enter your name."
+msgstr "لطفا نام خود را وارد کنید."
+
+msgid "API Key Missing"
+msgstr "کلید API یافت نشد"

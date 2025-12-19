@@ -19,17 +19,27 @@ class Zenith_Mobile_Auth_Public {
         // Shortcode
         add_shortcode( 'zenith_mobile_auth', [ $this, 'shortcode_login_form' ] );
 
-        // WooCommerce Hooks
+        // WooCommerce Account Details
         add_filter( 'woocommerce_account_details_fields', [ $this, 'clean_account_details' ], 10, 1 );
         add_action( 'woocommerce_edit_account_form', [ $this, 'readonly_phone_field' ] );
         
         if ( isset($this->options['enable_gender_field']) && $this->options['enable_gender_field'] == '1' ) {
+            // Edit Account
             add_action( 'woocommerce_edit_account_form_start', [ $this, 'render_gender_field_account' ] );
             add_action( 'woocommerce_save_account_details', [ $this, 'save_gender_field_account' ] );
+            
+            // Checkout - Input (Priority 1 = Top)
             add_filter( 'woocommerce_checkout_fields', [ $this, 'add_gender_checkout_field' ] );
+            
+            // Checkout - Save to Order Meta
             add_action( 'woocommerce_checkout_create_order', [ $this, 'save_gender_to_order_meta' ], 10, 2 );
+            // Checkout - Save to User Meta
             add_action( 'woocommerce_checkout_update_user_meta', [ $this, 'save_gender_to_user_meta' ], 10, 2 );
+
+            // Admin Order - Input (Edit Mode)
             add_filter( 'woocommerce_admin_billing_fields', [ $this, 'add_admin_order_billing_field' ] );
+            
+            // Admin Order - Save (Sync to User)
             add_action( 'woocommerce_process_shop_order_meta', [ $this, 'sync_admin_order_gender_to_user' ], 50, 1 );
         }
     }
@@ -40,10 +50,6 @@ class Zenith_Mobile_Auth_Public {
         wp_enqueue_script( 'zma-script', ZMA_URL . 'assets/js/zma-script.js', ['jquery'], ZMA_VERSION, true );
     }
 
-    // (get_dim & dynamic_styles remain the same, just removed IDs from HTML generation in render)
-    
-    // ... (include get_dim and dynamic_styles from previous versions) ...
-    // NOTE: Re-implementing them here to ensure completeness for the file replacement logic
     private function get_dim( $prefix, $default ) {
         $t = isset($this->options[$prefix.'_top']) ? $this->options[$prefix.'_top'] : $default;
         $r = isset($this->options[$prefix.'_right']) ? $this->options[$prefix.'_right'] : $default;
@@ -54,14 +60,74 @@ class Zenith_Mobile_Auth_Public {
 
     public function dynamic_styles() {
         $o = $this->options;
+        
         $con_pad = $this->get_dim('con_padding', '20px');
         $con_rad = $this->get_dim('con_radius', '8px');
         $con_bw  = $this->get_dim('con_border_w', '1px');
+        
         $inp_pad = $this->get_dim('inp_padding', '10px');
         $inp_rad = $this->get_dim('inp_radius', '4px');
+        
         $btn_pad = $this->get_dim('btn_padding', '12px');
         $btn_rad = $this->get_dim('btn_radius', '4px');
-        $css = ".woocommerce-form-login > p:not(.zma-container), .woocommerce-form-register, .u-column2, .col-2, .woocommerce-form-login .woocommerce-LostPassword, .woocommerce-form-login label[for='username'], .woocommerce-form-login label[for='password'], .woocommerce-form-login__submit { display: none !important; } .u-column1, .col-1 { width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; } .zma-container { max-width: " . esc_attr($o['con_width'] ?? '400px') . "; background-color: " . esc_attr($o['con_bg'] ?? '#ffffff') . "; padding: {$con_pad}; border-radius: {$con_rad}; border-width: {$con_bw}; border-style: " . esc_attr($o['con_border_style'] ?? 'solid') . "; border-color: " . esc_attr($o['con_border_color'] ?? '#e5e5e5') . "; } .zma-header h3 { font-size: " . esc_attr($o['title_font_size'] ?? '20px') . "; color: " . esc_attr($o['title_color'] ?? '#333') . "; margin-bottom: " . esc_attr($o['title_margin'] ?? '10px') . "; } .zma-header p { font-size: " . esc_attr($o['desc_font_size'] ?? '14px') . "; color: " . esc_attr($o['desc_color'] ?? '#666') . "; margin-bottom: " . esc_attr($o['desc_margin'] ?? '20px') . "; } .zma-input, .zma-otp-digit, .zma-select { padding: {$inp_pad}; border-radius: {$inp_rad}; border-color: " . esc_attr($o['inp_border_color'] ?? '#ccc') . "; border-width: 1px; border-style: solid; width: 100%; box-sizing: border-box; } .zma-btn { background-color: " . esc_attr($o['btn_bg'] ?? '#333') . "; color: " . esc_attr($o['btn_text'] ?? '#fff') . "; padding: {$btn_pad}; border-radius: {$btn_rad}; } .zma-input-group { margin-bottom: " . esc_attr($o['inp_margin'] ?? '15px') . "; } .zma-gender-options { display: flex; gap: 20px; align-items: center; } .zma-gender-label { display: flex; align-items: center; cursor: pointer; font-weight: normal !important; margin-right: 15px; } .zma-gender-label input { margin-right: 5px; width: auto !important; }";
+
+        $css = "
+            .woocommerce-form-login > p:not(.zma-container),
+            .woocommerce-form-register, .u-column2, .col-2,
+            .woocommerce-form-login .woocommerce-LostPassword,
+            .woocommerce-form-login label[for='username'],
+            .woocommerce-form-login label[for='password'],
+            .woocommerce-form-login__submit { display: none !important; }
+            .u-column1, .col-1 { width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; }
+            
+            .zma-container {
+                max-width: " . esc_attr($o['con_width'] ?? '400px') . ";
+                background-color: " . esc_attr($o['con_bg'] ?? '#ffffff') . ";
+                padding: {$con_pad};
+                border-radius: {$con_rad};
+                border-width: {$con_bw};
+                border-style: " . esc_attr($o['con_border_style'] ?? 'solid') . ";
+                border-color: " . esc_attr($o['con_border_color'] ?? '#e5e5e5') . ";
+            }
+            .zma-header h3 {
+                font-size: " . esc_attr($o['title_font_size'] ?? '20px') . ";
+                color: " . esc_attr($o['title_color'] ?? '#333') . ";
+                margin-bottom: " . esc_attr($o['title_margin'] ?? '10px') . ";
+            }
+            .zma-header p {
+                font-size: " . esc_attr($o['desc_font_size'] ?? '14px') . ";
+                color: " . esc_attr($o['desc_color'] ?? '#666') . ";
+                margin-bottom: " . esc_attr($o['desc_margin'] ?? '20px') . ";
+            }
+            .zma-input, .zma-otp-digit, .zma-select {
+                padding: {$inp_pad};
+                border-radius: {$inp_rad};
+                border-color: " . esc_attr($o['inp_border_color'] ?? '#ccc') . ";
+                border-width: 1px; border-style: solid;
+                width: 100%; box-sizing: border-box;
+                font-size: " . esc_attr($o['input_font_size'] ?? '16px') . ";
+            }
+            .zma-input-group label {
+                font-size: " . esc_attr($o['label_font_size'] ?? '14px') . ";
+                color: " . esc_attr($o['label_color'] ?? '#333') . ";
+            }
+            .zma-btn {
+                background-color: " . esc_attr($o['btn_bg'] ?? '#333') . ";
+                color: " . esc_attr($o['btn_text'] ?? '#fff') . ";
+                padding: {$btn_pad};
+                border-radius: {$btn_rad};
+            }
+            .zma-input-group { margin-bottom: " . esc_attr($o['inp_margin'] ?? '15px') . "; }
+            
+            .zma-gender-options { display: flex; gap: 20px; align-items: center; }
+            .zma-gender-label { display: flex; align-items: center; cursor: pointer; font-weight: normal !important; margin-right: 15px; }
+            .zma-gender-label input { margin-right: 5px; width: auto !important; }
+            
+            .zma-change-number, .zma-text-btn {
+                font-size: " . esc_attr($o['link_font_size'] ?? '12px') . ";
+                color: " . esc_attr($o['link_color'] ?? '#666') . ";
+            }
+        ";
         echo "<style>{$css}</style>";
     }
 
@@ -70,21 +136,17 @@ class Zenith_Mobile_Auth_Public {
             return '<p>' . __( 'You are already logged in.', 'zenith-mobile-auth' ) . '</p>';
         }
         ob_start();
-        $this->render_login_form( true ); // Force render even if called before
+        $this->render_login_form( true );
         return ob_get_clean();
     }
 
     public function render_login_form( $is_shortcode = false ) {
         if ( is_user_logged_in() ) return;
         
-        // Prevent double rendering ONLY for default hooks, NOT for shortcode/multiple usages
-        // Actually, we want to allow multiple instances now, so we remove the global check constraint
-        // But strict IDs must go.
-        
         $otp_len = $this->options['otp_length'] ?? 4;
         ?>
         <div class="zma-container">
-            <div class="zma-toast"></div> <!-- Class instead of ID -->
+            <div class="zma-toast"></div>
             
             <div class="zma-header">
                 <h3><?php esc_html_e( 'Login or Register', 'zenith-mobile-auth' ); ?></h3>
@@ -185,14 +247,97 @@ class Zenith_Mobile_Auth_Public {
         echo '<script>var zma_vars = ' . json_encode($vars) . ';</script>';
     }
 
-    // ... (clean_account_details, readonly_phone_field, render/save gender in account/order/checkout methods remain the same) ...
-    public function clean_account_details( $fields ) { if ( isset( $fields['account_email'] ) ) unset( $fields['account_email'] ); return $fields; }
-    public function readonly_phone_field() { $current_user = wp_get_current_user(); ?><p class="woocommerce-form-row form-row form-row-wide"><label><?php esc_html_e( 'Phone Number', 'zenith-mobile-auth' ); ?></label><input type="text" class="input-text" value="<?php echo esc_attr($current_user->user_login); ?>" readonly disabled /></p><style> #account_email_field { display: none !important; } </style><?php }
-    public function render_gender_field_account() { $user_id = get_current_user_id(); $gender = get_user_meta( $user_id, 'gender', true ); ?><div class="woocommerce-form-row form-row form-row-wide" style="margin-bottom: 20px;"><label style="display:block; margin-bottom:5px;"><?php esc_html_e( 'Gender', 'zenith-mobile-auth' ); ?></label><div style="display:flex; gap:15px;"><label style="font-weight:normal;"><input type="radio" name="account_gender" value="male" <?php checked( $gender, 'male' ); ?>> <?php esc_html_e( 'Male', 'zenith-mobile-auth' ); ?></label><label style="font-weight:normal;"><input type="radio" name="account_gender" value="female" <?php checked( $gender, 'female' ); ?>> <?php esc_html_e( 'Female', 'zenith-mobile-auth' ); ?></label></div></div><?php }
-    public function save_gender_field_account( $user_id ) { if ( isset( $_POST['account_gender'] ) ) update_user_meta( $user_id, 'gender', sanitize_text_field( $_POST['account_gender'] ) ); }
-    public function add_gender_checkout_field( $fields ) { $user_id = get_current_user_id(); $gender = $user_id ? get_user_meta( $user_id, 'gender', true ) : ''; $fields['billing']['billing_gender'] = array( 'type' => 'radio', 'label' => __( 'Gender', 'zenith-mobile-auth' ), 'options' => [ 'male' => __( 'Male', 'zenith-mobile-auth' ), 'female' => __( 'Female', 'zenith-mobile-auth' ) ], 'default' => $gender, 'required' => false, 'class' => ['form-row-wide'], 'priority' => 1 ); return $fields; }
-    public function save_gender_to_order_meta( $order, $data ) { if ( isset( $_POST['billing_gender'] ) && ! empty( $_POST['billing_gender'] ) ) $order->update_meta_data( '_billing_gender', sanitize_text_field( $_POST['billing_gender'] ) ); }
-    public function save_gender_to_user_meta( $user_id, $data ) { if ( isset( $_POST['billing_gender'] ) && ! empty( $_POST['billing_gender'] ) ) update_user_meta( $user_id, 'gender', sanitize_text_field( $_POST['billing_gender'] ) ); }
-    public function add_admin_order_billing_field( $fields ) { $gender_field = array( 'gender' => array( 'label' => __( 'Gender', 'zenith-mobile-auth' ), 'show' => false, 'type' => 'select', 'options' => [ 'male' => __( 'Male', 'zenith-mobile-auth' ), 'female' => __( 'Female', 'zenith-mobile-auth' ) ], 'priority' => 1 ) ); return array_merge( $gender_field, $fields ); }
-    public function sync_admin_order_gender_to_user( $post_id ) { $order = wc_get_order( $post_id ); if ( ! $order ) return; if ( isset( $_POST['_billing_gender'] ) ) { $gender = sanitize_text_field( $_POST['_billing_gender'] ); $user_id = $order->get_customer_id(); $order->update_meta_data( '_billing_gender', $gender ); $order->save(); if ( $user_id ) update_user_meta( $user_id, 'gender', $gender ); } }
+    public function clean_account_details( $fields ) {
+        if ( isset( $fields['account_email'] ) ) unset( $fields['account_email'] );
+        return $fields;
+    }
+
+    public function readonly_phone_field() {
+        $current_user = wp_get_current_user();
+        ?>
+        <p class="woocommerce-form-row form-row form-row-wide">
+            <label><?php esc_html_e( 'Phone Number', 'zenith-mobile-auth' ); ?></label>
+            <input type="text" class="input-text" value="<?php echo esc_attr($current_user->user_login); ?>" readonly disabled />
+        </p>
+        <style> #account_email_field { display: none !important; } </style>
+        <?php
+    }
+
+    public function render_gender_field_account() {
+        $user_id = get_current_user_id();
+        $gender = get_user_meta( $user_id, 'gender', true );
+        ?>
+        <div class="woocommerce-form-row form-row form-row-wide" style="margin-bottom: 20px;">
+            <label style="display:block; margin-bottom:5px;"><?php esc_html_e( 'Gender', 'zenith-mobile-auth' ); ?></label>
+            <div style="display:flex; gap:15px;">
+                <label style="font-weight:normal;"><input type="radio" name="account_gender" value="male" <?php checked( $gender, 'male' ); ?>> <?php esc_html_e( 'Male', 'zenith-mobile-auth' ); ?></label>
+                <label style="font-weight:normal;"><input type="radio" name="account_gender" value="female" <?php checked( $gender, 'female' ); ?>> <?php esc_html_e( 'Female', 'zenith-mobile-auth' ); ?></label>
+            </div>
+        </div>
+        <?php
+    }
+
+    public function save_gender_field_account( $user_id ) {
+        if ( isset( $_POST['account_gender'] ) ) {
+            update_user_meta( $user_id, 'gender', sanitize_text_field( $_POST['account_gender'] ) );
+        }
+    }
+
+    public function add_gender_checkout_field( $fields ) {
+        $user_id = get_current_user_id();
+        $gender = $user_id ? get_user_meta( $user_id, 'gender', true ) : '';
+
+        $fields['billing']['billing_gender'] = array(
+            'type'      => 'radio',
+            'label'     => __( 'Gender', 'zenith-mobile-auth' ),
+            'options'   => [ 'male' => __( 'Male', 'zenith-mobile-auth' ), 'female' => __( 'Female', 'zenith-mobile-auth' ) ],
+            'default'   => $gender,
+            'required'  => false,
+            'class'     => ['form-row-wide'],
+            'priority'  => 1
+        );
+        return $fields;
+    }
+
+    public function save_gender_to_order_meta( $order, $data ) {
+        if ( isset( $_POST['billing_gender'] ) && ! empty( $_POST['billing_gender'] ) ) {
+            $order->update_meta_data( '_billing_gender', sanitize_text_field( $_POST['billing_gender'] ) );
+        }
+    }
+
+    public function save_gender_to_user_meta( $user_id, $data ) {
+        if ( isset( $_POST['billing_gender'] ) && ! empty( $_POST['billing_gender'] ) ) {
+            update_user_meta( $user_id, 'gender', sanitize_text_field( $_POST['billing_gender'] ) );
+        }
+    }
+
+    public function add_admin_order_billing_field( $fields ) {
+        $gender_field = array(
+            'gender' => array(
+                'label'     => __( 'Gender', 'zenith-mobile-auth' ),
+                'show'      => false,
+                'type'      => 'select',
+                'options'   => [ 'male' => __( 'Male', 'zenith-mobile-auth' ), 'female' => __( 'Female', 'zenith-mobile-auth' ) ],
+                'priority'  => 1
+            )
+        );
+        return array_merge( $gender_field, $fields );
+    }
+
+    public function sync_admin_order_gender_to_user( $post_id ) {
+        $order = wc_get_order( $post_id );
+        if ( ! $order ) return;
+
+        if ( isset( $_POST['_billing_gender'] ) ) {
+            $gender = sanitize_text_field( $_POST['_billing_gender'] );
+            $user_id = $order->get_customer_id();
+            
+            $order->update_meta_data( '_billing_gender', $gender );
+            $order->save();
+
+            if ( $user_id ) {
+                update_user_meta( $user_id, 'gender', $gender );
+            }
+        }
+    }
 }

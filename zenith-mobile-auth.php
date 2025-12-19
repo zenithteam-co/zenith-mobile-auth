@@ -3,20 +3,22 @@
  * Plugin Name: Zenith Mobile Auth (OTP)
  * Plugin URI:  https://zenithteam.co
  * Description: Replaces WooCommerce login/register forms with a mobile-only OTP system. Supports Multiple Gateways (IPPanel default).
- * Version:     1.0.0
+ * Version:     1.1.0
  * Author:      Mahdi Soltani
  * Author URI:  https://zenithteam.co/mahdi-soltani
  * License:     GPL2
  * Text Domain: zenith-mobile-auth
+ * Domain Path: /languages
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// Define Constants
 define( 'ZMA_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZMA_URL', plugin_dir_url( __FILE__ ) );
-define( 'ZMA_VERSION', '1.0.0' );
+define( 'ZMA_VERSION', '1.1.0' );
 
 // 1. Load Abstract & Manager First
 require_once ZMA_PATH . 'includes/abstract-zma-gateway.php';
@@ -26,7 +28,7 @@ require_once ZMA_PATH . 'includes/class-zma-gateway-manager.php';
 require_once ZMA_PATH . 'includes/class-zma-ajax.php';
 require_once ZMA_PATH . 'includes/class-zma-public.php';
 
-// 3. Load Gateways (Force load built-ins so they are available for Manager init)
+// 3. Load Gateways
 foreach ( glob( ZMA_PATH . 'includes/gateways/*.php' ) as $filename ) {
     require_once $filename;
 }
@@ -53,7 +55,10 @@ class Zenith_Mobile_Auth {
     }
 
     private function __construct() {
-        // Initialize Gateway Manager immediately
+        // Load Text Domain for Translations
+        add_action( 'plugins_loaded', [ $this, 'load_textdomain' ] );
+
+        // Init Gateway Manager
         ZMA_Gateway_Manager::init();
 
         new Zenith_Mobile_Auth_Public();
@@ -65,6 +70,14 @@ class Zenith_Mobile_Auth {
                 new Zenith_Mobile_Auth_Updater( __FILE__, 'ZenithTeam', 'zenith-mobile-auth' );
             }
         }
+    }
+
+    public function load_textdomain() {
+        load_plugin_textdomain( 
+            'zenith-mobile-auth', 
+            false, 
+            dirname( plugin_basename( __FILE__ ) ) . '/languages' 
+        );
     }
 }
 

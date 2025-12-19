@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
     
-    // 1. Tab Switching
+    // Tab Switching
     $('.zma-nav li').on('click', function() {
         var tabId = $(this).data('tab');
         $('.zma-nav li').removeClass('active');
@@ -9,14 +9,30 @@ jQuery(document).ready(function($) {
         $('#tab-' + tabId).addClass('active');
     });
 
-    // 2. Color Pickers
+    // Conditional Logic (Dependencies)
+    function checkDependencies() {
+        $('[data-toggle-target]').each(function() {
+            var $this = $(this);
+            var target = $($this.data('toggle-target'));
+            if ($this.is(':checked')) {
+                target.slideDown();
+            } else {
+                target.slideUp();
+            }
+        });
+    }
+    
+    $('[data-toggle-target]').on('change', checkDependencies);
+    checkDependencies(); // Run on init
+
+    // Color Pickers
     $('.zma-color-picker').wpColorPicker({
         change: function(event, ui) {
             updateSimplePreview($(event.target), ui.color.toString());
         }
     });
 
-    // 3. Simple Inputs (Color, Width etc)
+    // Simple Inputs
     $('.zma-live-css').on('input change keyup', function() {
         updateSimplePreview($(this), $(this).val());
     });
@@ -27,43 +43,34 @@ jQuery(document).ready(function($) {
         if(target && prop) $(target).css(prop, val);
     }
 
-    // 4. Dimension Controls (Elementor-like Linked Logic)
-    
-    // Toggle Link Button
+    // Dimension Controls
     $('.zma-link-btn').on('click', function() {
         var btn = $(this);
         var wrapper = btn.closest('.zma-dim-control');
         var inputHidden = wrapper.find('.zma-linked-val');
         
         if (btn.hasClass('active')) {
-            // Unlink
             btn.removeClass('active');
             wrapper.attr('data-linked', '0');
             inputHidden.val('0');
         } else {
-            // Link
             btn.addClass('active');
             wrapper.attr('data-linked', '1');
             inputHidden.val('1');
-            
-            // Sync values to the first input's value
             var firstVal = wrapper.find('.zma-live-dim').first().val();
             wrapper.find('.zma-live-dim').val(firstVal).trigger('input');
         }
     });
 
-    // Handle Dimension Input
     $('.zma-live-dim').on('input', function() {
         var $this = $(this);
         var wrapper = $this.closest('.zma-dim-control');
         var isLinked = wrapper.attr('data-linked') === '1';
         
         if (isLinked) {
-            // Update siblings
             wrapper.find('.zma-live-dim').not($this).val($this.val());
         }
 
-        // Update Preview (Construct Shorthand: top right bottom left)
         var top = wrapper.find('[data-side="top"]').val() || '0px';
         var right = wrapper.find('[data-side="right"]').val() || '0px';
         var bottom = wrapper.find('[data-side="bottom"]').val() || '0px';
@@ -71,8 +78,7 @@ jQuery(document).ready(function($) {
 
         var shorthand = `${top} ${right} ${bottom} ${left}`;
         var target = $this.data('css-target');
-        var prop = $this.data('css-prop'); // e.g., 'padding' or 'border-radius'
-        
+        var prop = $this.data('css-prop');
         $(target).css(prop, shorthand);
     });
 });

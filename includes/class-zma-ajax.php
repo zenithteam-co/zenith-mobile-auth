@@ -4,14 +4,22 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Zenith_Mobile_Auth_Ajax {
 
     public function __construct() {
+        // Standard OTP Steps
         add_action( 'wp_ajax_nopriv_zma_send_otp', [ $this, 'send_otp' ] );
         add_action( 'wp_ajax_zma_send_otp', [ $this, 'send_otp' ] );
         add_action( 'wp_ajax_nopriv_zma_verify_otp', [ $this, 'verify_otp' ] );
         add_action( 'wp_ajax_zma_verify_otp', [ $this, 'verify_otp' ] );
+        
+        // Step 3: Update Info (Must be nopriv because user is not fully logged in yet during flow)
         add_action( 'wp_ajax_nopriv_zma_update_user_info', [ $this, 'update_user_info' ] );
         add_action( 'wp_ajax_zma_update_user_info', [ $this, 'update_user_info' ] );
+
+        // Utils
         add_action( 'wp_ajax_zma_test_sms', [ $this, 'test_sms' ] );
         add_action( 'wp_ajax_zma_reset_user_limits', [ $this, 'reset_user_limits' ] );
+        
+        // Cleanup when user is deleted
+        add_action( 'delete_user', [ $this, 'cleanup_deleted_user' ] );
     }
 
     private function normalize_phone( $phone ) {
@@ -27,13 +35,14 @@ class Zenith_Mobile_Auth_Ajax {
         return $phone;
     }
 
-    // (check_rate_limit & increment_rate_limit methods - same as before)
     private function check_rate_limit( $phone ) {
         $settings = get_option('zma_settings');
         $limit = isset($settings['daily_limit']) ? (int)$settings['daily_limit'] : 10;
         $key = 'zma_limit_' . md5($phone . '_' . date('Y-m-d'));
         $count = get_transient($key);
-        return ($count === false) ? 0 : (($count >= $limit) ? false : $count);
+        if ( $count === false ) $count = 0;
+        if ( $count >= $limit ) return false;
+        return $count; 
     }
 
     private function increment_rate_limit( $phone, $current_count ) {
@@ -61,12 +70,13 @@ class Zenith_Mobile_Auth_Ajax {
         $min = pow(10, $len - 1);
         $max = pow(10, $len) - 1;
         $otp = rand( $min, $max );
+        
+        // Client Token for OTP Verification step only
         $otp_token = wp_generate_password( 32, false );
 
         set_transient( 'zma_otp_' . $phone_hash, ['otp' => $otp, 'token' => $otp_token], 120 );
         delete_transient( 'zma_otp_attempts_' . $phone_hash );
 
-        // USE GATEWAY MANAGER
         $gateway = ZMA_Gateway_Manager::get_active_gateway();
         if ( ! $gateway ) wp_send_json_error( [ 'message' => 'No active gateway found.' ] );
 
@@ -84,10 +94,12 @@ class Zenith_Mobile_Auth_Ajax {
 
     public function verify_otp() {
         check_ajax_referer( 'zma_auth_nonce', 'security' );
+        
         $phone = $this->normalize_phone( $_POST['phone'] ?? '' );
         $otp_input = $_POST['otp'] ?? '';
         $client_token = $_POST['token'] ?? '';
 
+        // English Conversion
         $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
         $arabic  = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
         $english = range( 0, 9 );
@@ -126,11 +138,11 @@ class Zenith_Mobile_Auth_Ajax {
             wp_send_json_error( [ 'message' => sprintf( __('Invalid Code. %d attempts remaining.', 'zenith-mobile-auth'), $remaining ) ] );
         }
 
-        // Success
+        // --- SUCCESS ---
         delete_transient( 'zma_otp_' . $phone_hash );
         delete_transient( $attempts_key );
-        delete_transient( 'zma_limit_' . md5($phone . '_' . date('Y-m-d')) );
-        delete_transient( 'zma_wait_' . $phone_hash ); // Reset Wait Timer on Login
+        delete_transient( 'zma_limit_' . md5($phone . '_' . date('Y-m-d')) ); // Reset Daily Limit on successful login
+        delete_transient( 'zma_wait_' . $phone_hash ); // Reset Wait Timer on successful login
 
         $user = get_user_by( 'login', $phone );
         if ( ! $user ) {
@@ -157,13 +169,28 @@ class Zenith_Mobile_Auth_Ajax {
         }
 
         if ( $require_info ) {
+            // Temporary Session for Step 3 (Info Collection)
             $temp_token = wp_generate_password( 64, false );
-            set_transient( 'zma_temp_session_' . $temp_token, [ 'user_id' => $user_id, 'phone' => $phone, 'redirect_to' => $redirect ], 600 );
-            wp_send_json_success( [ 'message' => __('Verification Successful. Please complete your profile.', 'zenith-mobile-auth'), 'require_info' => true, 'session_token' => $temp_token ] );
+            set_transient( 'zma_temp_session_' . $temp_token, [
+                'user_id' => $user_id,
+                'phone'   => $phone,
+                'redirect_to' => $redirect
+            ], 600 );
+
+            wp_send_json_success( [ 
+                'message' => __('Verification Successful. Please complete your profile.', 'zenith-mobile-auth'), 
+                'require_info' => true, 
+                'session_token' => $temp_token 
+            ] );
         } else {
             wp_set_auth_cookie( $user_id, true );
             wp_set_current_user( $user_id );
-            wp_send_json_success( [ 'message' => __('Login Successful', 'zenith-mobile-auth'), 'redirect_to' => $redirect, 'require_info' => false ] );
+            
+            wp_send_json_success( [ 
+                'message' => __('Login Successful', 'zenith-mobile-auth'), 
+                'redirect_to' => $redirect, 
+                'require_info' => false 
+            ] );
         }
     }
 
@@ -184,13 +211,31 @@ class Zenith_Mobile_Auth_Ajax {
 
         if ( ! empty($fname) || ! empty($lname) ) {
             $display_name = trim( $fname . ' ' . $lname );
-            wp_update_user([ 'ID' => $user_id, 'first_name' => $fname, 'last_name' => $lname, 'display_name' => $display_name ]);
+            wp_update_user([ 
+                'ID' => $user_id, 
+                'first_name' => $fname, 
+                'last_name' => $lname,
+                'display_name' => $display_name
+            ]);
             update_user_meta( $user_id, 'billing_first_name', $fname );
             update_user_meta( $user_id, 'billing_last_name', $lname );
         }
         
         if ( ! empty($gender) ) {
             update_user_meta( $user_id, 'gender', $gender );
+        }
+
+        // Welcome Message Logic
+        $settings = get_option('zma_settings');
+        if ( isset($settings['enable_welcome']) && $settings['enable_welcome'] == '1' && !empty($settings['welcome_pattern']) ) {
+            $gateway = ZMA_Gateway_Manager::get_active_gateway();
+            if ( $gateway ) {
+                $gateway->send_notification( 
+                    $session_data['phone'], 
+                    $settings['welcome_pattern'], 
+                    [ 'name' => $fname . ' ' . $lname ] 
+                );
+            }
         }
 
         wp_set_auth_cookie( $user_id, true );
@@ -221,13 +266,30 @@ class Zenith_Mobile_Auth_Ajax {
         $user_id = isset( $_POST['user_id'] ) ? intval( $_POST['user_id'] ) : 0;
         $user = get_user_by( 'id', $user_id );
         if ( ! $user ) wp_send_json_error( [ 'message' => 'User not found' ] );
+        
         $phone = $this->normalize_phone( $user->user_login ); 
         if ( ! $phone ) wp_send_json_error( [ 'message' => 'User login is not a valid phone number' ] );
+        
         $phone_hash = md5( $phone );
         delete_transient( 'zma_limit_' . md5($phone . '_' . date('Y-m-d')) );
         delete_transient( 'zma_wait_' . $phone_hash );
         delete_transient( 'zma_otp_attempts_' . $phone_hash );
         delete_transient( 'zma_otp_' . $phone_hash );
+        
         wp_send_json_success( [ 'message' => 'User limits and blocks have been reset successfully.' ] );
+    }
+
+    public function cleanup_deleted_user( $user_id ) {
+        $user = get_userdata( $user_id );
+        if ( $user ) {
+            $phone = $this->normalize_phone( $user->user_login );
+            if ( $phone ) {
+                $phone_hash = md5( $phone );
+                delete_transient( 'zma_limit_' . md5($phone . '_' . date('Y-m-d')) );
+                delete_transient( 'zma_wait_' . $phone_hash );
+                delete_transient( 'zma_otp_attempts_' . $phone_hash );
+                delete_transient( 'zma_otp_' . $phone_hash );
+            }
+        }
     }
 }

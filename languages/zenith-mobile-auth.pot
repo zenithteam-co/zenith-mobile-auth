@@ -1,0 +1,201 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Zenith Mobile Auth 2.2.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e;ex:1,2c;n:1,2;n_noop:1,2;x:1,2c;esc_attr;esc_attr_e;esc_attr_x:1,2c;esc_html;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/class-zma-admin.php:36
+msgid "Zenith Mobile Auth"
+msgstr ""
+
+#: includes/class-zma-admin.php:37
+msgid "Mobile Auth (OTP)"
+msgstr ""
+
+#: includes/class-zma-admin.php:123
+msgid "Login or Register"
+msgstr ""
+
+#: includes/class-zma-admin.php:124
+msgid "We will send an OTP code to your mobile number."
+msgstr ""
+
+#: includes/class-zma-admin.php:132
+msgid "Phone Number"
+msgstr ""
+
+#: includes/class-zma-admin.php:143 includes/class-zma-public.php:143
+msgid "Send Code"
+msgstr ""
+
+#: includes/class-zma-admin.php:153
+msgid "Zenith Mobile Auth Status"
+msgstr ""
+
+#: includes/class-zma-admin.php:155
+msgid "Daily SMS Usage"
+msgstr ""
+
+#: includes/class-zma-admin.php:162
+msgid "Security Status"
+msgstr ""
+
+#: includes/class-zma-admin.php:165
+msgid "In Wait Time (Resend Blocked)"
+msgstr ""
+
+#: includes/class-zma-admin.php:169
+msgid "Blocked (Too many incorrect attempts)"
+msgstr ""
+
+#: includes/class-zma-admin.php:171
+#, php-format
+msgid "%d Incorrect Attempts (Max %d)"
+msgstr ""
+
+#: includes/class-zma-admin.php:173
+msgid "Clean (No issues)"
+msgstr ""
+
+#: includes/class-zma-admin.php:177
+msgid "Actions"
+msgstr ""
+
+#: includes/class-zma-admin.php:180
+msgid "Unblock & Reset Limits"
+msgstr ""
+
+#: includes/class-zma-admin.php:182
+msgid "This will reset the daily limit count, wait timer, and incorrect attempt counter for this user."
+msgstr ""
+
+#: includes/class-zma-admin.php:193 includes/class-zma-public.php:237
+#: includes/class-zma-public.php:253
+msgid "Gender"
+msgstr ""
+
+#: includes/class-zma-admin.php:198 includes/class-zma-public.php:172
+#: includes/class-zma-public.php:240 includes/class-zma-public.php:273
+msgid "Male"
+msgstr ""
+
+#: includes/class-zma-admin.php:202 includes/class-zma-public.php:175
+#: includes/class-zma-public.php:240 includes/class-zma-public.php:273
+msgid "Female"
+msgstr ""
+
+#: includes/class-zma-ajax.php:33 includes/class-zma-ajax.php:57
+#: includes/class-zma-ajax.php:109 includes/class-zma-ajax.php:171
+msgid "Invalid Phone"
+msgstr ""
+
+#: includes/class-zma-ajax.php:37
+msgid "Daily SMS limit reached. Try tomorrow."
+msgstr ""
+
+#: includes/class-zma-ajax.php:44
+#, php-format
+msgid "Please wait %d seconds before requesting a new code."
+msgstr ""
+
+#: includes/class-zma-ajax.php:61
+msgid "Code Sent"
+msgstr ""
+
+#: includes/class-zma-ajax.php:114
+msgid "Code expired. Please request a new code."
+msgstr ""
+
+#: includes/class-zma-ajax.php:115
+msgid "Session mismatch. Please request a new code."
+msgstr ""
+
+#: includes/class-zma-ajax.php:124 includes/class-zma-ajax.php:132
+msgid "Too many failed attempts. Code invalidated."
+msgstr ""
+
+#: includes/class-zma-ajax.php:135
+#, php-format
+msgid "Invalid Code. %d attempts remaining."
+msgstr ""
+
+#: includes/class-zma-ajax.php:176
+msgid "Verification Successful. Please complete your profile."
+msgstr ""
+
+#: includes/class-zma-ajax.php:184 includes/class-zma-ajax.php:229
+msgid "Login Successful"
+msgstr ""
+
+#: includes/class-zma-ajax.php:195
+msgid "Session expired. Please restart login."
+msgstr ""
+
+#: includes/class-zma-ajax.php:226
+msgid "Profile Updated. Redirecting..."
+msgstr ""
+
+#: includes/class-zma-public.php:132
+msgid "Code sent to"
+msgstr ""
+
+#: includes/class-zma-public.php:133
+msgid "Change Number"
+msgstr ""
+
+#: includes/class-zma-public.php:143
+msgid "Verify & Login"
+msgstr ""
+
+#: includes/class-zma-public.php:145
+msgid "Resend in"
+msgstr ""
+
+#: includes/class-zma-public.php:146
+msgid "Resend Code"
+msgstr ""
+
+#: includes/class-zma-public.php:151
+msgid "Complete your profile"
+msgstr ""
+
+#: includes/class-zma-public.php:154
+msgid "First Name"
+msgstr ""
+
+#: includes/class-zma-public.php:159
+msgid "Last Name"
+msgstr ""
+
+#: includes/class-zma-public.php:178
+msgid "Save & Continue"
+msgstr ""
+
+#: includes/class-zma-public.php:181
+msgid "Skip for now"
+msgstr ""
+
+#: includes/class-zma-public.php:191
+msgid "Sending..."
+msgstr ""
+
+#: includes/class-zma-public.php:192
+msgid "Verifying..."
+msgstr ""
+
+#: includes/class-zma-public.php:193
+msgid "Saving..."
+msgstr ""
+
+#: includes/class-zma-public.php:196
+msgid "Enter Full Code"
+msgstr ""
+
+#: includes/class-zma-public.php:197
+msgid "Please enter your name."
+msgstr ""
