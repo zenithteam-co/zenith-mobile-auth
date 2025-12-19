@@ -2,9 +2,8 @@ jQuery(document).ready(function($) {
     
     let timerInterval;
     let currentSessionToken = '';
-    let finalRedirectUrl = ''; // Store the redirect URL for step 3
+    let finalRedirectUrl = ''; 
 
-    // Ensure phone input is enabled and focused on load
     setTimeout(function() {
         $('#zma-phone').prop('disabled', false).focus();
     }, 500);
@@ -19,7 +18,6 @@ jQuery(document).ready(function($) {
         if (!str) return '';
         var persian = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
         var arabic  = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-        
         for(var i=0; i<10; i++) {
             var regP = new RegExp(persian[i], "g");
             var regA = new RegExp(arabic[i], "g");
@@ -49,17 +47,13 @@ jQuery(document).ready(function($) {
     function sendOtp(btnClicked) {
         var phone = $('#zma-phone').val();
         phone = toEnglish(phone); 
-
         var btn = $(btnClicked);
         if (btn.length === 0) btn = $('#zma-send-otp-btn'); 
-
         if (btn.prop('disabled')) return;
-
         if(!phone || phone.length < 10) {
             showToast(zma_vars.strings.error_phone, 'error');
             return;
         }
-
         var originalText = btn.text();
         btn.prop('disabled', true).text(zma_vars.strings.sending);
 
@@ -71,14 +65,11 @@ jQuery(document).ready(function($) {
             if(response.success) {
                 currentSessionToken = response.data.token;
                 btn.text(originalText);
-                
                 showToast(response.data.message, 'success');
                 $('#zma-phone-display').text(response.data.phone);
                 $('#zma-step-phone').removeClass('active');
                 $('#zma-step-otp').addClass('active');
-                
                 $('#zma-otp-real').val('').focus();
-                
                 startTimer();
             } else {
                 btn.prop('disabled', false).text(originalText);
@@ -89,12 +80,10 @@ jQuery(document).ready(function($) {
 
     function verifyOtp() {
         var otp = toEnglish($('#zma-otp-real').val());
-
         if(otp.length !== zma_vars.otp_len) {
             showToast(zma_vars.strings.error_otp, 'error');
             return;
         }
-
         var btn = $('#zma-verify-otp-btn');
         if (btn.prop('disabled')) return;
         btn.prop('disabled', true).text(zma_vars.strings.verifying);
@@ -104,11 +93,15 @@ jQuery(document).ready(function($) {
             otp: otp,
             phone: $('#zma-phone-display').text(),
             token: currentSessionToken,
-            redirect_to: window.location.href, // Pass current URL as potential redirect source
+            redirect_to: window.location.href,
             security: zma_vars.nonce
         }, function(response) {
             if(response.success) {
-                // Check if we need to show Info Step
+                // UPDATE NONCE with new one from server
+                if ( response.data.new_nonce ) {
+                    zma_vars.nonce = response.data.new_nonce;
+                }
+
                 if ( response.data.require_info ) {
                     finalRedirectUrl = response.data.redirect_to;
                     showToast(response.data.message, 'success');
@@ -127,11 +120,10 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // Step 3: Save Info
     function saveInfo(isSkip = false) {
         var fname = $('#zma-fname').val();
         var lname = $('#zma-lname').val();
-        var gender = $('#zma-gender').val();
+        var gender = $('input[name="zma_gender"]:checked').val(); // Get Radio Value
 
         if ( !isSkip && (!fname || !lname) ) {
             showToast(zma_vars.strings.error_name, 'error');
@@ -148,7 +140,7 @@ jQuery(document).ready(function($) {
             lname: lname,
             gender: gender,
             redirect_to: finalRedirectUrl,
-            security: zma_vars.nonce
+            security: zma_vars.nonce // This now uses the NEW valid nonce
         }, function(response) {
             if(response.success) {
                 showToast(response.data.message, 'success');
@@ -185,13 +177,11 @@ jQuery(document).ready(function($) {
     $('#zma-otp-real').on('input focus blur', function(e) {
         var val = $(this).val();
         var clean = toEnglish(val);
-        
         clean = clean.replace(/\D/g, ''); 
         if (clean.length > zma_vars.otp_len) clean = clean.substring(0, zma_vars.otp_len);
         if (val !== clean) $(this).val(clean);
 
         $('.zma-otp-digit').val('').removeClass('active'); 
-        
         for (var i = 0; i < zma_vars.otp_len; i++) {
             if(i < clean.length) $('.zma-otp-digit').eq(i).val(clean[i]);
         }
