@@ -1,0 +1,19 @@
+# Operating System
+
+.DS_Store Thumbs.db Desktop.ini
+
+# IDEs
+
+.vscode/ .idea/ \*.sublime-project \*.sublime-workspace \*.swp
+
+# Node & Composer
+
+node_modules/ package-lock.json vendor/ composer.lock
+
+# Logs
+
+\*.log error_log debug.log
+
+# Archives/Builds
+
+\*.zip \*.tar.gz dist/
