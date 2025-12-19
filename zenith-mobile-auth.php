@@ -3,7 +3,7 @@
  * Plugin Name: Zenith Mobile Auth (OTP)
  * Plugin URI:  https://zenithteam.co
  * Description: Replaces WooCommerce login/register forms with a mobile-only OTP system. Supports Multiple Gateways (IPPanel default).
- * Version:     1.0.0
+ * Version:     2.2.1
  * Author:      Mahdi Soltani
  * Author URI:  https://zenithteam.co/mahdi-soltani
  * License:     GPL2
@@ -17,16 +17,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Define Constants
 define( 'ZMA_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZMA_URL', plugin_dir_url( __FILE__ ) );
-define( 'ZMA_VERSION', '2.2.0' );
+define( 'ZMA_VERSION', '2.2.1' );
 
-// Include Core Classes
-require_once ZMA_PATH . 'includes/abstract-zma-gateway.php';       // 1. Abstract
-require_once ZMA_PATH . 'includes/class-zma-gateway-manager.php';  // 2. Manager
+// 1. Load Abstract Base Class
+require_once ZMA_PATH . 'includes/abstract-zma-gateway.php';
+
+// 2. Load Gateway Manager
+require_once ZMA_PATH . 'includes/class-zma-gateway-manager.php';
+
+// 3. Load Ajax & Public
 require_once ZMA_PATH . 'includes/class-zma-ajax.php';
 require_once ZMA_PATH . 'includes/class-zma-public.php';
 
-// Include Gateways
-require_once ZMA_PATH . 'includes/gateways/class-zma-gateway-ippanel.php';
+// 4. Load Built-in Gateways (Ensure this file exists in includes/gateways/)
+if ( file_exists( ZMA_PATH . 'includes/gateways/class-zma-gateway-ippanel.php' ) ) {
+    require_once ZMA_PATH . 'includes/gateways/class-zma-gateway-ippanel.php';
+}
 
 if ( is_admin() ) {
     require_once ZMA_PATH . 'includes/class-zma-admin.php';
@@ -64,7 +70,7 @@ class Zenith_Mobile_Auth {
         if ( is_admin() ) {
             new Zenith_Mobile_Auth_Admin();
             
-            // Init Updater (Configure your repo details)
+            // Init Updater
             if ( class_exists( 'Zenith_Mobile_Auth_Updater' ) ) {
                 new Zenith_Mobile_Auth_Updater( __FILE__, 'ZenithTeam', 'zenith-mobile-auth' );
             }

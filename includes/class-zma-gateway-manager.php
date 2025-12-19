@@ -12,7 +12,9 @@ class ZMA_Gateway_Manager {
 
     public static function load_gateways() {
         // Register Default
-        self::register( new ZMA_Gateway_IPPanel() );
+        if ( class_exists( 'ZMA_Gateway_IPPanel' ) ) {
+            self::register( new ZMA_Gateway_IPPanel() );
+        }
 
         // Allow other plugins to register
         do_action( 'zma_register_gateways' );
