@@ -1,0 +1,74 @@
+/* Global */
+.zma-admin-wrapper {
+    margin: 20px 20px 0 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.zma-admin-header {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    border-left: 5px solid #007cba;
+}
+.zma-admin-header h1 { margin: 0; font-size: 24px; color: #23282d; }
+.zma-admin-header p { margin: 5px 0 0; color: #666; font-size: 14px; }
+
+.zma-admin-body { display: flex; gap: 30px; align-items: flex-start; }
+
+/* Sidebar */
+.zma-sidebar { width: 250px; flex-shrink: 0; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+.zma-nav { list-style: none; margin: 0; padding: 0; }
+.zma-nav li { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; color: #444; font-weight: 500; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+.zma-nav li:hover { background: #f9f9f9; color: #007cba; }
+.zma-nav li.active { background: #f0f6fc; color: #007cba; border-left: 3px solid #007cba; }
+.zma-nav li .dashicons { font-size: 18px; width: 18px; height: 18px; }
+.zma-save-area { padding: 15px; background: #f9f9f9; text-align: center; border-top: 1px solid #eee; }
+.zma-save-btn { width: 100%; }
+
+/* Content */
+.zma-content { flex: 1; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 30px; min-width: 400px; }
+.zma-tab-content { display: none; }
+.zma-tab-content.active { display: block; }
+.zma-form-group { margin-bottom: 20px; }
+.zma-form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
+.zma-info-box { background: #e6f7ff; padding: 15px; border-left: 4px solid #1890ff; color: #0050b3; margin-top: 20px; font-size: 13px; }
+
+.zma-card { background: #f8f9fa; border: 1px solid #eee; border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+.zma-card h3 { margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #eee; margin-bottom: 15px; font-size: 14px; text-transform: uppercase; color: #888; }
+.zma-row { display: flex; gap: 15px; margin-bottom: 15px; }
+.zma-col { flex: 1; }
+
+/* Dimension Controls (Elementor Style) */
+.zma-dim-wrapper { margin-bottom: 15px; }
+.zma-dim-label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 8px; }
+.zma-dim-control { display: flex; align-items: flex-start; gap: 5px; }
+.zma-dim-inputs { display: flex; gap: 2px; flex: 1; }
+.zma-dim-field { flex: 1; text-align: center; }
+.zma-dim-input { width: 100% !important; text-align: center; font-size: 12px; padding: 5px !important; height: 30px !important; }
+.zma-dim-field label { font-size: 10px; color: #999; margin-top: 4px; display: block; font-weight: normal; text-transform: uppercase; }
+
+.zma-link-btn {
+    background: transparent; border: none; cursor: pointer; color: #ccc; padding: 5px; margin-top: 2px;
+}
+.zma-link-btn .dashicons { font-size: 16px; width: 16px; height: 16px; }
+.zma-link-btn .dashicons-editor-unlink { display: none; }
+.zma-link-btn.active .dashicons-admin-links { display: inline-block; }
+.zma-link-btn.active .dashicons-editor-unlink { display: none; }
+.zma-link-btn:not(.active) .dashicons-admin-links { display: none; }
+.zma-link-btn:not(.active) .dashicons-editor-unlink { display: inline-block; }
+.zma-link-btn.active { color: #333; background: #eee; border-radius: 3px; }
+
+/* Preview */
+.zma-preview-pane { width: 350px; flex-shrink: 0; }
+.zma-preview-sticky { position: sticky; top: 50px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); border: 1px solid #e5e5e5; }
+.zma-preview-sticky h3 { margin-top: 0; text-align: center; color: #444; }
+.zma-preview-box {
+    background-image: linear-gradient(45deg, #f0f0f1 25%, transparent 25%), linear-gradient(-45deg, #f0f0f1 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f1 75%), linear-gradient(-45deg, transparent 75%, #f0f0f1 75%);
+    background-size: 20px 20px;
+    padding: 20px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+}
