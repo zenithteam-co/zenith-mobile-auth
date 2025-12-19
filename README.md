@@ -32,9 +32,10 @@
 
 Create a pattern in your IPPanel dashboard with the following format to support Auto-fill:
 
+```
 Your verification code is %code%.
-
 @yourdomain.com #%code%
+```
 
 ### Settings
 
@@ -50,35 +51,22 @@ This plugin supports automatic updates via GitHub. When a new release is tagged 
 ## Extending Gateways
 
 To add a new SMS provider, extend the ZMA_Gateway class and register it:
-
+```
 class My_Custom_Gateway extends ZMA_Gateway {
-
-public function \__construct() {
-
-$this->id = 'custom_gw';
-
-$this->name = 'My Custom Gateway';
-
-parent::\__construct();
-
+    public function __construct() {
+        $this->id = 'custom_gw';
+        $this->name = 'My Custom Gateway';
+        parent::__construct();
+    }
+    public function send_pattern($phone, $otp) {
+        // API Logic here
+        return true; // or error string
+    }
 }
-
-public function send_pattern($phone, $otp) {
-
-// API Logic here
-
-return true; // or error string
-
-}
-
-}
-
 add_action('zma_register_gateways', function() {
-
-ZMA_Gateway_Manager::register(new My_Custom_Gateway());
-
+    ZMA_Gateway_Manager::register(new My_Custom_Gateway());
 });
-
+```
 ## Credits
 
 Developed by [Mahdi Soltani](https://www.google.com/search?q=https://zenithteam.co/mahdi-soltani) | [Zenith Team](https://zenithteam.co).
