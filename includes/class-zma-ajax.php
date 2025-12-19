@@ -139,7 +139,6 @@ class Zenith_Mobile_Auth_Ajax {
             if ( is_wp_error( $user_id ) ) wp_send_json_error( [ 'message' => $user_id->get_error_message() ] );
             $user = get_user_by( 'id', $user_id );
         } else {
-            // Update billing phone for existing users too on login
             update_user_meta( $user->ID, 'billing_phone', $phone );
         }
 
@@ -154,19 +153,22 @@ class Zenith_Mobile_Auth_Ajax {
             $redirect = get_permalink( $myaccount );
         }
 
-        // Check if Info Collection is Required
+        // Check Info Requirement
         $require_info = false;
         if ( isset($settings['enable_name_field']) && $settings['enable_name_field'] == '1' ) {
-            // Check if name is empty
             if ( empty($user->first_name) && empty($user->last_name) ) {
                 $require_info = true;
             }
         }
 
+        // --- NEW: GENERATE FRESH NONCE FOR LOGGED-IN SESSION ---
+        $new_nonce = wp_create_nonce( 'zma_auth_nonce' );
+
         wp_send_json_success( [ 
             'message' => __('Login Successful', 'zenith-mobile-auth'), 
             'redirect_to' => $redirect,
-            'require_info' => $require_info 
+            'require_info' => $require_info,
+            'new_nonce' => $new_nonce // Send valid nonce for next step
         ] );
     }
 
@@ -191,7 +193,6 @@ class Zenith_Mobile_Auth_Ajax {
             update_user_meta( $user_id, 'gender', $gender );
         }
 
-        // Return original redirect
         $redirect = home_url();
         if ( ! empty( $_POST['redirect_to'] ) ) {
             $redirect = esc_url_raw( $_POST['redirect_to'] );
